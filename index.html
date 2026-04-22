@@ -11,7 +11,7 @@
   --accent:#1a4f8a;--accent2:#2b6cb0;--accent-light:#dbeafe;
   --accent-light2:#bfdbfe;--dot-empty:#c8d4e3;
   --mark-bg:#fef08a;--shadow:0 1px 4px rgba(0,0,0,.07);
-  --cat-v:#1a4f8a;--cat-b:#1a7a5a;
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);
 }
 [data-theme="dark"]{
   --bg:#0c1520;--surface:#111e2e;--surface2:#162030;--border:#1e3045;
@@ -19,22 +19,14 @@
   --accent:#4a9de0;--accent2:#5baee8;--accent-light:#1a2d45;
   --accent-light2:#1e3555;--dot-empty:#2a3d52;
   --mark-bg:#78530a;--shadow:0 1px 6px rgba(0,0,0,.3);
-  --cat-v:#4a9de0;--cat-b:#3ac490;
+  --shadow-md:0 4px 20px rgba(0,0,0,.4);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);height:100vh;display:flex;flex-direction:column;transition:background .2s,color .2s}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);height:100vh;display:flex;flex-direction:column;transition:background .2s,color .2s;overflow:hidden}
 
 /* TOPBAR */
 .topbar{display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;box-shadow:var(--shadow)}
 .logo-wrap{display:flex;align-items:center;gap:10px}
-.logo-dots{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:2px}
-.ld{border-radius:50%}
-.ld.s{width:8px;height:8px}
-.ld.m{width:10px;height:10px}
-.ld.light{background:#5bb3e8}
-.ld.dark{background:#1a4f8a}
-[data-theme="dark"] .ld.dark{background:#4a9de0}
-[data-theme="dark"] .ld.light{background:#2a7ab5}
 .logo-text{font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
 .logo-sub{font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
@@ -43,8 +35,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .theme-btn:hover{background:var(--accent-light);border-color:var(--accent)}
 .theme-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
 
+/* TAB BAR */
+.tabbar{display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;padding:0 16px}
+.tabbtn{padding:10px 18px;font-size:12px;font-weight:600;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;letter-spacing:.02em}
+.tabbtn.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tabbtn:hover:not(.on){color:var(--text2)}
+
 /* MAIN */
-.main{display:flex;flex:1;overflow:hidden;gap:0}
+.main{display:flex;flex:1;overflow:hidden}
+.tab-panel{display:none;flex:1;overflow:hidden}
+.tab-panel.on{display:flex}
 
 /* NAV */
 .nav{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
@@ -60,10 +60,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .nav-body{flex:1;overflow-y:auto;padding:8px 6px 12px}
 .nav-body::-webkit-scrollbar{width:3px}
 .nav-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-
 .pt-divider{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:10px 6px 4px;display:flex;align-items:center;gap:6px}
 .pt-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
 .cat-row{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;cursor:pointer;user-select:none;transition:background .12s;margin-bottom:1px;color:var(--text)}
 .cat-row:hover{background:var(--surface2)}
 .cat-row.open{background:var(--accent-light)}
@@ -93,21 +91,95 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .empty-state{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--text3);padding:2rem}
 .empty-state svg{opacity:.4;stroke:var(--text3)}
 .empty-state p{font-size:13px;text-align:center;line-height:1.6;color:var(--text3)}
-.blocked-state{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--text2);padding:2rem;text-align:center;max-width:380px}
-.blocked-state .icon-wrap{width:60px;height:60px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center}
-.blocked-state svg{stroke:var(--accent);fill:none;stroke-width:1.5}
-.blocked-state h3{font-size:14px;font-weight:600;color:var(--text)}
-.blocked-state p{font-size:12.5px;line-height:1.6;color:var(--text2)}
-.blocked-state .url-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text3);word-break:break-all;line-height:1.5;width:100%}
-.copy-btn{padding:6px 14px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);font-size:11px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s}
-.copy-btn:hover{opacity:.85}
+
+/* DASHBOARD PANEL */
+.dashboard{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:20px}
+.dashboard::-webkit-scrollbar{width:4px}
+.dashboard::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* OPPSLAGSTAVLE */
+.board-section{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.section-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.section-title svg{stroke:var(--accent);fill:none;stroke-width:2;width:16px;height:16px}
+.add-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);font-size:11px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s}
+.add-btn:hover{opacity:.85}
+.feed{display:flex;flex-direction:column;gap:0}
+.feed-item{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);animation:fadeIn .2s ease}
+.feed-item:last-child{border-bottom:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.feed-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.feed-content{flex:1}
+.feed-text{font-size:12.5px;color:var(--text);line-height:1.5}
+.feed-meta{font-size:10px;color:var(--text3);margin-top:3px}
+.feed-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:0 4px;opacity:.5;transition:opacity .15s;flex-shrink:0}
+.feed-del:hover{opacity:1;color:#e53e3e}
+.feed-empty{padding:20px 16px;text-align:center;font-size:12px;color:var(--text3)}
+.add-form{padding:12px 16px;border-top:1px solid var(--border);background:var(--surface2);display:none;gap:8px;flex-direction:column}
+.add-form.open{display:flex}
+.add-form textarea{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text);resize:none;outline:none;font-family:inherit;line-height:1.5;min-height:60px}
+.add-form textarea:focus{border-color:var(--accent)}
+.form-row{display:flex;gap:8px;align-items:center}
+.priority-sel{padding:5px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:11px;color:var(--text2);outline:none;cursor:pointer}
+.form-btns{display:flex;gap:6px;margin-left:auto}
+.cancel-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;font-size:11px;color:var(--text2);cursor:pointer}
+.post-btn{padding:5px 12px;border-radius:7px;border:none;background:var(--accent);font-size:11px;font-weight:600;color:#fff;cursor:pointer}
+
+/* LAB CARDS */
+.labs-section{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow)}
+.lab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}
+.lab-card{border-radius:12px;padding:16px 14px;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;gap:8px;border:1px solid transparent;position:relative;overflow:hidden}
+.lab-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.lab-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.lab-card.fixed{background:linear-gradient(135deg,#1a4f8a15,#1a4f8a08);border-color:#1a4f8a30}
+.lab-card.fixed::before{background:linear-gradient(90deg,#1a4f8a,#2b6cb0)}
+.lab-card.mobile{background:linear-gradient(135deg,#0f6e5615,#0f6e5608);border-color:#0f6e5630}
+.lab-card.mobile::before{background:linear-gradient(90deg,#0f6e56,#1a9070)}
+[data-theme="dark"] .lab-card.fixed{background:linear-gradient(135deg,#1a4f8a25,#1a4f8a10);border-color:#1a4f8a50}
+[data-theme="dark"] .lab-card.mobile{background:linear-gradient(135deg,#0f6e5625,#0f6e5610);border-color:#0f6e5650}
+.lab-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lab-card.fixed .lab-icon{background:#1a4f8a18}
+.lab-card.mobile .lab-icon{background:#0f6e5618}
+.lab-icon svg{width:18px;height:18px;fill:none;stroke-width:1.8}
+.lab-card.fixed .lab-icon svg{stroke:#1a4f8a}
+.lab-card.mobile .lab-icon svg{stroke:#0f6e56}
+[data-theme="dark"] .lab-card.fixed .lab-icon svg{stroke:#4a9de0}
+[data-theme="dark"] .lab-card.mobile .lab-icon svg{stroke:#3ac490}
+.lab-name{font-size:13px;font-weight:700;color:var(--text)}
+.lab-type{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.lab-card.fixed .lab-type{color:#1a4f8a}
+.lab-card.mobile .lab-type{color:#0f6e56}
+[data-theme="dark"] .lab-card.fixed .lab-type{color:#4a9de0}
+[data-theme="dark"] .lab-card.mobile .lab-type{color:#3ac490}
+.lab-open{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-top:2px}
+.lab-open svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* PRIORITY COLORS */
+.p-info{background:#3b82f6}.p-warning{background:#f59e0b}.p-urgent{background:#ef4444}
+
+/* MOBILE */
+@media(max-width:640px){
+  body{overflow:auto;height:auto;min-height:100vh}
+  .main{flex-direction:column;overflow:visible}
+  .tab-panel.on{flex-direction:column}
+  .nav{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:none}
+  .viewer{min-height:200px}
+  .viewer-top{flex-wrap:wrap;gap:6px}
+  .dashboard{padding:12px;gap:14px}
+  .lab-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .topbar{padding:0 12px}
+  .logo-text{font-size:12px}
+  .badge{display:none}
+}
+@media(max-width:380px){
+  .lab-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="logo-wrap">
-    <!-- Recreated logo dots (4 dots in 2x2 grid with size/color variation) -->
-    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+    <svg width="32" height="32" viewBox="0 0 34 34" fill="none">
       <circle cx="8" cy="8" r="5.5" fill="#5bb3e8"/>
       <circle cx="22" cy="8" r="4.5" fill="#5bb3e8" opacity=".6"/>
       <circle cx="8" cy="22" r="4.5" fill="#1a4f8a"/>
@@ -115,51 +187,139 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </svg>
     <div>
       <div class="logo-text">Sykehuset Østfold</div>
-      <div class="logo-sub">Røntgenprosedyrer</div>
+      <div class="logo-sub">Bildediagnostikk</div>
     </div>
   </div>
   <div class="topbar-right">
     <span class="badge">Radiologi</span>
-    <button class="theme-btn" onclick="toggleTheme()" title="Bytt tema" id="theme-btn">
+    <button class="theme-btn" onclick="toggleTheme()" title="Bytt tema">
       <svg id="theme-ico" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
     </button>
   </div>
 </div>
 
+<div class="tabbar">
+  <button class="tabbtn on" onclick="switchTab('prosedyrer',this)">📋 Prosedyrer</button>
+  <button class="tabbtn" onclick="switchTab('dashboard',this)">🏠 Oversikt</button>
+</div>
+
 <div class="main">
-  <div class="nav">
-    <div class="nav-top">
-      <div class="ptabs">
-        <button class="ptab on" onclick="setPt('alle',this)">Alle</button>
-        <button class="ptab" onclick="setPt('voksen',this)">Voksen</button>
-        <button class="ptab" onclick="setPt('barn',this)">Barn</button>
+  <!-- PROSEDYRER TAB -->
+  <div class="tab-panel on" id="tab-prosedyrer">
+    <div class="nav">
+      <div class="nav-top">
+        <div class="ptabs">
+          <button class="ptab on" onclick="setPt('alle',this)">Alle</button>
+          <button class="ptab" onclick="setPt('voksen',this)">Voksen</button>
+          <button class="ptab" onclick="setPt('barn',this)">Barn</button>
+        </div>
+        <div class="search-wrap">
+          <svg class="sico" viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+          <input type="text" id="q" placeholder="Søk prosedyre…" oninput="render()">
+        </div>
       </div>
-      <div class="search-wrap">
-        <svg class="sico" viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
-        <input type="text" id="q" placeholder="Søk prosedyre…" oninput="render()">
+      <div class="nav-body" id="nav-body"></div>
+    </div>
+    <div class="viewer">
+      <div class="viewer-top" id="viewer-top">
+        <span class="viewer-title empty" id="viewer-title">Velg en prosedyre fra listen</span>
+        <a class="ext-btn" id="open-ext-btn" style="display:none" target="_blank" href="#">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>
+          Åpne lenke
+        </a>
+      </div>
+      <div class="viewer-body" id="viewer-body">
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 6h13l11 11v25H14V6z"/><path d="M27 6v11h11"/><line x1="19" y1="22" x2="35" y2="22"/><line x1="19" y1="28" x2="35" y2="28"/><line x1="19" y1="34" x2="29" y2="34"/></svg>
+          <p>Velg en prosedyre til venstre<br>for å se detaljer</p>
+        </div>
       </div>
     </div>
-    <div class="nav-body" id="nav-body"></div>
   </div>
 
-  <div class="viewer">
-    <div class="viewer-top" id="viewer-top">
-      <span class="viewer-title empty" id="viewer-title">Velg en prosedyre fra listen</span>
-      <a class="ext-btn" id="open-ext-btn" style="display:none" target="_blank" href="#">
-        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>
-        Åpne lenke
-      </a>
-    </div>
-    <div class="viewer-body" id="viewer-body">
-      <div class="empty-state">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 6h13l11 11v25H14V6z"/><path d="M27 6v11h11"/><line x1="19" y1="22" x2="35" y2="22"/><line x1="19" y1="28" x2="35" y2="28"/><line x1="19" y1="34" x2="29" y2="34"/></svg>
-        <p>Velg en prosedyre til venstre<br>for å se detaljer</p>
+  <!-- DASHBOARD TAB -->
+  <div class="tab-panel" id="tab-dashboard">
+    <div class="dashboard">
+
+      <!-- OPPSLAGSTAVLE -->
+      <div class="board-section">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Oppslagstavle
+          </div>
+          <button class="add-btn" onclick="toggleForm()">+ Ny melding</button>
+        </div>
+        <div class="add-form" id="add-form">
+          <textarea id="msg-input" placeholder="Skriv melding her…" rows="3"></textarea>
+          <div class="form-row">
+            <select class="priority-sel" id="priority-sel">
+              <option value="info">ℹ️ Info</option>
+              <option value="warning">⚠️ Advarsel</option>
+              <option value="urgent">🔴 Viktig</option>
+            </select>
+            <div class="form-btns">
+              <button class="cancel-btn" onclick="toggleForm()">Avbryt</button>
+              <button class="post-btn" onclick="postMsg()">Publiser</button>
+            </div>
+          </div>
+        </div>
+        <div class="feed" id="feed"></div>
+      </div>
+
+      <!-- MASKINLOGG -->
+      <div class="labs-section">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Maskinlogg
+          </div>
+        </div>
+        <div class="lab-grid">
+          <div class="lab-card fixed" onclick="openLab('https://hsorhf.sharepoint.com/:w:/r/sites/SHF-O-461010BildediagnostikkAkuttKalnes/_layouts/15/Doc.aspx?sourcedoc=%7B780AFDDC-BA02-483E-9558-0FFA0A00C2EB%7D&file=LOGGBOK%20LAB%204.docx&action=default&mobileredirect=true')">
+            <div class="lab-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <div class="lab-name">Lab 4</div>
+            <div class="lab-type">Fast installasjon</div>
+            <div class="lab-open"><svg viewBox="0 0 16 16"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>Åpne loggbok</div>
+          </div>
+          <div class="lab-card fixed" onclick="openLab('https://hsorhf.sharepoint.com/:w:/r/sites/SHF-O-461010BildediagnostikkAkuttKalnes/_layouts/15/Doc.aspx?sourcedoc=%7B5F8BC542-D898-4F64-83F1-FE17A14005DC%7D&file=LOGGBOK%20LAB%206.docx&action=default&mobileredirect=true')">
+            <div class="lab-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <div class="lab-name">Lab 6</div>
+            <div class="lab-type">Fast installasjon</div>
+            <div class="lab-open"><svg viewBox="0 0 16 16"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>Åpne loggbok</div>
+          </div>
+          <div class="lab-card fixed" onclick="openLab('https://hsorhf.sharepoint.com/:w:/r/sites/SHF-O-461010BildediagnostikkAkuttKalnes/_layouts/15/Doc.aspx?sourcedoc=%7B39A87826-9A24-4233-8DEB-F0EC5DDDA673%7D&file=LOGGBOK%20LAB%207.docx&action=default&mobileredirect=true')">
+            <div class="lab-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <div class="lab-name">Lab 7</div>
+            <div class="lab-type">Fast installasjon</div>
+            <div class="lab-open"><svg viewBox="0 0 16 16"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>Åpne loggbok</div>
+          </div>
+          <div class="lab-card mobile" onclick="openLab('https://hsorhf.sharepoint.com/:w:/r/sites/SHF-O-461010BildediagnostikkAkuttKalnes/_layouts/15/Doc.aspx?sourcedoc=%7B8A8BD90B-4F3F-458B-85DA-29BBBAB184A5%7D&file=LOGGBOK%20TRANSPORTABELT%202.docx&action=default&mobileredirect=true')">
+            <div class="lab-icon"><svg viewBox="0 0 24 24"><polyline points="5 17 3 17 3 5 21 5 21 17 19 17"/><rect x="7" y="17" width="10" height="4" rx="1"/></svg></div>
+            <div class="lab-name">Transportabel 2</div>
+            <div class="lab-type">Mobil enhet</div>
+            <div class="lab-open"><svg viewBox="0 0 16 16"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>Åpne loggbok</div>
+          </div>
+          <div class="lab-card mobile" onclick="openLab('https://hsorhf.sharepoint.com/:w:/r/sites/SHF-O-461010BildediagnostikkAkuttKalnes/_layouts/15/Doc.aspx?sourcedoc=%7B1D402204-E145-472F-A71C-22B79BE00FA2%7D&file=LOGGBOK%20TRANSPORTABELT%203.docx&action=default&mobileredirect=true')">
+            <div class="lab-icon"><svg viewBox="0 0 24 24"><polyline points="5 17 3 17 3 5 21 5 21 17 19 17"/><rect x="7" y="17" width="10" height="4" rx="1"/></svg></div>
+            <div class="lab-name">Transportabel 3</div>
+            <div class="lab-type">Mobil enhet</div>
+            <div class="lab-open"><svg viewBox="0 0 16 16"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>Åpne loggbok</div>
+          </div>
+          <div class="lab-card mobile" onclick="openLab('https://hsorhf.sharepoint.com/:w:/r/sites/SHF-O-461010BildediagnostikkAkuttKalnes/_layouts/15/Doc.aspx?sourcedoc=%7B4E2EF88B-4AF1-4805-AD0A-AF7BF2826A4D%7D&file=LOGGBOK%20TRANSPORTABELT%204.docx&action=default&mobileredirect=true')">
+            <div class="lab-icon"><svg viewBox="0 0 24 24"><polyline points="5 17 3 17 3 5 21 5 21 17 19 17"/><rect x="7" y="17" width="10" height="4" rx="1"/></svg></div>
+            <div class="lab-name">Transportabel 4</div>
+            <div class="lab-type">Mobil enhet</div>
+            <div class="lab-open"><svg viewBox="0 0 16 16"><path d="M7 3H3v10h10V9M10 2h4v4M14 2L8 8"/></svg>Åpne loggbok</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+// ── DATA ──────────────────────────────────────────────────────────────────
 const CATS=[
   {id:"caput",label:"Caput",color:"#1a4f8a",pt:"voksen",procs:[
     {name:"RG Caput / RG Orbita ved spørsmål om fremmedlegeme",url:null}
@@ -234,49 +394,85 @@ const CATS=[
   ]}
 ];
 
-let pt="alle", activeProc=null, activeUrl=null;
+// ── STATE ─────────────────────────────────────────────────────────────────
+let pt="alle", activeProc=null;
 const openCats={};
 CATS.forEach(c=>openCats[c.id]=false);
 
-// Theme
+// ── THEME ─────────────────────────────────────────────────────────────────
 const root=document.documentElement;
 const stored=localStorage.getItem('so-theme')||'light';
 root.setAttribute('data-theme',stored);
 updateThemeIcon(stored);
 
 function toggleTheme(){
-  const cur=root.getAttribute('data-theme');
-  const next=cur==='light'?'dark':'light';
+  const next=root.getAttribute('data-theme')==='light'?'dark':'light';
   root.setAttribute('data-theme',next);
   localStorage.setItem('so-theme',next);
   updateThemeIcon(next);
 }
 function updateThemeIcon(t){
   const ico=document.getElementById('theme-ico');
-  if(t==='dark') ico.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-  else ico.innerHTML='<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+  ico.innerHTML=t==='dark'
+    ?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    :'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
 }
 
+// ── TABS ──────────────────────────────────────────────────────────────────
+function switchTab(id, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+
+// ── FEED ──────────────────────────────────────────────────────────────────
+let msgs=JSON.parse(localStorage.getItem('so-msgs')||'[]');
+
+function saveMsgs(){ localStorage.setItem('so-msgs',JSON.stringify(msgs)); }
+
+function renderFeed(){
+  const feed=document.getElementById('feed');
+  if(!msgs.length){ feed.innerHTML='<div class="feed-empty">Ingen meldinger ennå</div>'; return; }
+  feed.innerHTML=msgs.map((m,i)=>`
+    <div class="feed-item">
+      <span class="feed-dot p-${m.p}" style="margin-top:5px"></span>
+      <div class="feed-content">
+        <div class="feed-text">${m.text}</div>
+        <div class="feed-meta">${m.author} · ${m.date}</div>
+      </div>
+      <button class="feed-del" onclick="delMsg(${i})" title="Slett">×</button>
+    </div>`).join('');
+}
+
+function toggleForm(){
+  const f=document.getElementById('add-form');
+  f.classList.toggle('open');
+  if(f.classList.contains('open')) document.getElementById('msg-input').focus();
+}
+
+function postMsg(){
+  const txt=document.getElementById('msg-input').value.trim();
+  if(!txt) return;
+  const p=document.getElementById('priority-sel').value;
+  const now=new Date();
+  msgs.unshift({text:txt,p,author:'Radiografi',date:now.toLocaleDateString('no-NO',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})});
+  saveMsgs(); renderFeed();
+  document.getElementById('msg-input').value='';
+  document.getElementById('add-form').classList.remove('open');
+}
+
+function delMsg(i){ msgs.splice(i,1); saveMsgs(); renderFeed(); }
+
+// ── LABS ──────────────────────────────────────────────────────────────────
+function openLab(url){ window.open(url,'_blank'); }
+
+// ── PROSEDYRER ────────────────────────────────────────────────────────────
 function setPt(val,btn){
   pt=val;
   document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  function copyUrl(url, btn){
-  try {
-    const ta=document.createElement('textarea');
-    ta.value=url; ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent='✓ Kopiert!';
-    setTimeout(()=>btn.textContent='Kopier lenke',1800);
-  } catch(e){
-    btn.textContent='Kunne ikke kopiere';
-    setTimeout(()=>btn.textContent='Kopier lenke',2000);
-  }
-}
-
-render();
+  render();
 }
 
 function toggleCat(id){
@@ -284,40 +480,24 @@ function toggleCat(id){
   render();
 }
 
-function selectProc(name, url){
-  activeProc=name; activeUrl=url;
+function selectProc(name,url){
+  activeProc=name;
   const titleEl=document.getElementById('viewer-title');
   titleEl.textContent=name;
   titleEl.className='viewer-title';
   const extBtn=document.getElementById('open-ext-btn');
   const body=document.getElementById('viewer-body');
-
-  if(url && url!=='null'){
-    extBtn.href=url;
-    extBtn.style.display='inline-flex';
-    body.innerHTML=`
-      <div style="width:100%;height:100%;display:flex;flex-direction:column;">
-        <iframe src="${url}" title="${name}" style="flex:1;width:100%;border:none;display:block;"
-          onerror="this.style.display='none';document.getElementById('pdf-fallback').style.display='flex'">
-        </iframe>
-        <div id="pdf-fallback" style="display:none;flex-direction:column;align-items:center;gap:12px;padding:2rem;text-align:center;color:var(--text2);max-width:380px;margin:auto">
-          <div class="icon-wrap"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-          <h3 style="font-size:14px;font-weight:600;color:var(--text)">${name}</h3>
-          <p style="font-size:12.5px;line-height:1.6">Dokumentet kunne ikke vises her. Det kan kreve VPN eller sykehusets interne nettverk. Åpne lenken direkte i nettleseren.</p>
-          <div class="url-box">${url}</div>
-          <button class="copy-btn" onclick="copyUrl('${url}',this)">Kopier lenke</button>
-        </div>
-      </div>`;
+  if(url&&url!=='null'){
+    extBtn.href=url; extBtn.style.display='inline-flex';
+    window.open(url,'_blank');
+    body.innerHTML=`<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 6h13l11 11v25H14V6z"/><path d="M27 6v11h11"/><line x1="19" y1="22" x2="35" y2="22"/><line x1="19" y1="28" x2="35" y2="28"/><line x1="19" y1="34" x2="29" y2="34"/></svg>
+      <p><strong>${name}</strong><br>ble åpnet i en ny fane</p></div>`;
   } else {
     extBtn.style.display='none';
-    body.innerHTML=`
-      <div class="blocked-state">
-        <div class="icon-wrap">
-          <svg width="28" height="28" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-        </div>
-        <h3>${name}</h3>
-        <p>Lenke til denne prosedyren er ikke lagt inn ennå. Legg til URL i <code>CATS</code>-listen i kildekoden for å aktivere denne.</p>
-      </div>`;
+    body.innerHTML=`<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 6h13l11 11v25H14V6z"/><path d="M27 6v11h11"/></svg>
+      <p><strong>${name}</strong><br>Lenke ikke lagt inn ennå</p></div>`;
   }
   renderNav();
 }
@@ -345,30 +525,24 @@ function renderNav(){
   const cats=visibleCats(q);
   const showBoth=pt==='alle';
   let html='';
-
   if(q){
     cats.forEach(c=>{
-      c.procs.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).forEach(p=>{
-        html+=pRow(p,c,q,true);
-      });
+      c.procs.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).forEach(p=>{ html+=pRow(p,c,q,true); });
     });
     if(!html) html=`<div class="no-results">Ingen treff for «${q}»</div>`;
   } else {
-    const vCats=cats.filter(c=>c.pt==='voksen');
-    const bCats=cats.filter(c=>c.pt==='barn');
-    if(showBoth&&vCats.length){ html+=`<div class="pt-divider">Voksen</div>`; vCats.forEach(c=>{html+=catBlock(c,q);}); }
-    else { vCats.forEach(c=>{html+=catBlock(c,q);}); }
-    if(showBoth&&bCats.length){ html+=`<div class="pt-divider">Barn</div>`; bCats.forEach(c=>{html+=catBlock(c,q);}); }
-    else { bCats.forEach(c=>{html+=catBlock(c,q);}); }
+    const vC=cats.filter(c=>c.pt==='voksen'), bC=cats.filter(c=>c.pt==='barn');
+    if(showBoth&&vC.length) html+=`<div class="pt-divider">Voksen</div>`;
+    vC.forEach(c=>{ html+=catBlock(c,q); });
+    if(showBoth&&bC.length) html+=`<div class="pt-divider">Barn</div>`;
+    bC.forEach(c=>{ html+=catBlock(c,q); });
   }
-
   document.getElementById('nav-body').innerHTML=html;
 }
 
 function catBlock(c,q){
-  const isOpen=openCats[c.id];
   const hasActive=c.procs.some(p=>p.name===activeProc);
-  const show=isOpen||hasActive;
+  const show=openCats[c.id]||hasActive;
   const rows=c.procs.map(p=>pRow(p,c,q,false)).join('');
   return `<div>
     <div class="cat-row${show?' open':''}" onclick="toggleCat('${c.id}')">
@@ -383,17 +557,18 @@ function catBlock(c,q){
 
 function pRow(p,c,q,flat){
   const isAct=activeProc===p.name;
-  const indent=flat?'padding-left:8px':'';
+  const style=flat?'padding-left:8px':'';
   const safeUrl=p.url||'null';
   const safeName=p.name.replace(/'/g,"\\'");
-  const dotHtml=p.url?`<span class="has-link"></span>`:`<span class="no-link"></span>`;
-  return `<div class="prow${isAct?' active':''}" style="${indent}" onclick="selectProc('${safeName}','${safeUrl}')">
-    ${dotHtml}
+  return `<div class="prow${isAct?' active':''}" style="${style}" onclick="selectProc('${safeName}','${safeUrl}')">
+    <span class="${p.url?'has-link':'no-link'}"></span>
     <span class="pname">${hl(p.name,q)}</span>
   </div>`;
 }
 
+// ── INIT ──────────────────────────────────────────────────────────────────
 render();
+renderFeed();
 </script>
 </body>
 </html>
