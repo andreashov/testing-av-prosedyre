@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="no" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bildediagnostikk – Sykehuset Østfold</title>
+<style>
+/* ... Dine eksisterende variabler og stiler beholdes ... */
+:root{
+  --bg:#f0f4f9;--surface:#fff;--surface2:#f7f9fc;--border:#dde3ec;
+  --text:#0d1b2e;--text2:#4a5a72;--text3:#8a97aa;
+  --accent:#1a4f8a;--accent-light:#dbeafe;--dot-empty:#c8d4e3;
+  --mark-bg:#fef08a;--shadow:0 1px 4px rgba(0,0,0,.07);
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);
+}
+[data-theme="dark"]{
+  --bg:#0c1520;--surface:#111e2e;--surface2:#162030;--border:#1e3045;
+  --text:#e8edf5;--text2:#94a8c0;--text3:#4a6070;
+  --accent:#4a9de0;--accent-light:#1a2d45;--dot-empty:#2a3d52;
+  --mark-bg:#78530a;--shadow:0 1px 6px rgba(0,0,0,.3);
+  --shadow-md:0 4px 20px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+.topbar{display:flex;align-items:center;gap:12px;padding:0 14px;height:50px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;box-shadow:var(--shadow)}
+.logo-wrap{display:flex;align-items:center;gap:8px}
+.logo-text{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+.logo-sub{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.theme-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .15s}
+.theme-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* MODALITET BAR */
+.modalitet-bar{display:flex;gap:6px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
+.mod-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .15s;flex:1;min-width:80px;height:72px}
+.mod-btn.on{background:var(--accent);border-color:var(--accent);color: #fff}
+.mod-icon{width:24px;height:24px}
+.mod-label{font-size:10px;font-weight:600}
+.mod-soon{font-size:7px;background:rgba(0,0,0,0.05);padding:2px 4px;border-radius:4px}
+
+/* MAIN LAYOUT */
+.main{display:flex;flex:1;overflow:hidden}
+.left-panel{width:320px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.nav-body{flex:1;overflow-y:auto;padding:8px}
+
+/* VIEWER */
+.viewer{flex:1;display:flex;flex-direction:column;background:var(--bg)}
+.viewer-top{padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.viewer-body{flex:1;position:relative}
+iframe{width:100%;height:100%;border:none}
+
+/* Diverse */
+.prow{padding:10px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px}
+.prow:hover{background:var(--surface2)}
+.prow.active{background:var(--accent-light);color:var(--accent);font-weight:600}
+.cat-row{padding:12px 10px;font-weight:600;display:flex;align-items:center;cursor:pointer;border-bottom:1px solid var(--border)}
+.cat-arr{margin-left:auto;transition:0.2s}
+.cat-arr.open{transform:rotate(90deg)}
+
+/* Loggbøker styling */
+.lab-item{padding:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:10px}
+.lab-dot{width:8px;height:8px;border-radius:50%}
+.fixed{background:var(--accent)}
+.mobile-lab{background:#10b981}
+
+/* RESPONSIVE */
+@media(max-width:800px){
+    .left-panel{width:100%}
+    .viewer{display:none}
+    .main.view-active .left-panel{display:none}
+    .main.view-active .viewer{display:flex}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="logo-wrap">
+        <svg width="30" height="30" viewBox="0 0 34 34">
+            <circle cx="8" cy="8" r="5.5" fill="#5bb3e8"/>
+            <circle cx="22" cy="8" r="4.5" fill="#5bb3e8" opacity=".6"/>
+            <circle cx="8" cy="22" r="4.5" fill="#1a4f8a"/>
+            <circle cx="22" cy="22" r="3.5" fill="#1a4f8a" opacity=".7"/>
+        </svg>
+        <div>
+            <div class="logo-text">Sykehuset Østfold</div>
+            <div class="logo-sub">Bildediagnostikk</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button class="theme-btn" onclick="toggleTheme()" title="Bytt tema">
+            <svg id="theme-ico" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+    </div>
+</div>
+
+<div class="modalitet-bar" id="modBar">
+    <button class="mod-btn on" onclick="setMod('rg', this)">
+        <span class="mod-label">Røntgen</span>
+    </button>
+    <button class="mod-btn" onclick="setMod('ct', this)">
+        <span class="mod-label">CT</span>
+        <span class="mod-soon">Kommer</span>
+    </button>
+    <button class="mod-btn" onclick="setMod('ul', this)">
+        <span class="mod-label">Ultralyd</span>
+        <span class="mod-soon">Kommer</span>
+    </button>
+</div>
+
+<div class="main" id="mainFrame">
+    <div class="left-panel">
+        <div style="padding:12px; border-bottom:1px solid var(--border); display:flex; gap:5px;">
+            <button class="ptab on" onclick="setPt('voksen',this)" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); cursor:pointer">Voksen</button>
+            <button class="ptab" onclick="setPt('barn',this)" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); cursor:pointer">Barn</button>
+        </div>
+        <div style="padding:10px">
+            <input type="text" id="q" placeholder="Søk i prosedyrer..." oninput="render()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); outline:none">
+        </div>
+        <div class="nav-body" id="nav-body"></div>
+    </div>
+
+    <div class="viewer">
+        <div class="viewer-top">
+            <span id="viewer-title" style="font-weight:600; font-size:14px">Velg en prosedyre</span>
+            <button onclick="closeViewer()" id="mobile-back" style="display:none; padding:5px 10px">Tilbake</button>
+        </div>
+        <div class="viewer-body" id="viewer-body">
+            <div style="padding:40px; text-align:center; color:var(--text3)">
+                <p>Dokumentet vil vises her</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Data hentet fra koden din
+const CATS = [
+    {id:'thorax-v', label:'Thorax / Abdomen', pt:'voksen', procs:[
+        {name:'RG Thorax / Cor', url:'https://ek-sohf.sikt.sykehuspartner.no/docs/pub/DOK14399.pdf'},
+        {name:'RG Costa', url:'https://ek-sohf.sikt.sykehuspartner.no/docs/pub/DOK04179.pdf'}
+    ]},
+    {id:'over-v', label:'Overekstremitet', pt:'voksen', procs:[
+        {name:'RG Skulder', url:'https://ek-sohf.sikt.sykehuspartner.no/docs/pub/DOK04212.pdf'},
+        {name:'RG Albue', url:'https://ek-sohf.sikt.sykehuspartner.no/docs/pub/DOK04219.pdf'}
+    ]}
+    // ... legg til resten her
+];
+
+let currentPt = 'voksen';
+let activeMod = 'rg';
+const openCats = {};
+
+function setPt(val, btn) {
+    currentPt = val;
+    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    render();
+}
+
+function setMod(mod, btn) {
+    activeMod = mod;
+    document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    
+    if(mod !== 'rg') {
+        document.getElementById('nav-body').innerHTML = '<div style="padding:20px; color:var(--text3)">Kommer snart...</div>';
+    } else {
+        render();
+    }
+}
+
+function toggleCat(id) {
+    openCats[id] = !openCats[id];
+    render();
+}
+
+function openProc(name, url) {
+    document.getElementById('viewer-title').innerText = name;
+    // På mobil vil vi kanskje åpne i ny fane, på desktop i iframe
+    if(window.innerWidth > 800) {
+        document.getElementById('viewer-body').innerHTML = `<iframe src="${url}"></iframe>`;
+    } else {
+        window.open(url, '_blank');
+    }
+}
+
+function render() {
+    const query = document.getElementById('q').value.toLowerCase();
+    const container = document.getElementById('nav-body');
+    container.innerHTML = '';
+
+    const filtered = CATS.filter(c => c.pt === currentPt);
+
+    filtered.forEach(cat => {
+        const hasMatch = cat.procs.some(p => p.name.toLowerCase().includes(query));
+        if (query && !hasMatch) return;
+
+        const catEl = document.createElement('div');
+        const isOpen = openCats[cat.id] || query;
+        
+        catEl.innerHTML = `
+            <div class="cat-row" onclick="toggleCat('${cat.id}')">
+                <span>${cat.label}</span>
+                <span class="cat-arr ${isOpen?'open':''}">▸</span>
+            </div>
+            <div class="proc-list" style="display:${isOpen?'block':'none'}">
+                ${cat.procs.filter(p => p.name.toLowerCase().includes(query)).map(p => `
+                    <div class="prow" onclick="openProc('${p.name}', '${p.url}')">
+                        <span>•</span> ${p.name}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(catEl);
+    });
+}
+
+function toggleTheme() {
+    const root = document.documentElement;
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    
+    const ico = document.getElementById('theme-ico');
+    if(next === 'dark') {
+        ico.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-11.314l.707.707m11.314 11.314l.707.707M12 5a7 7 0 100 14 7 7 0 000-14z"/>';
+    } else {
+        ico.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+    }
+}
+
+// Initial render
+render();
+</script>
+
+</body>
+</html>
